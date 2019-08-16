@@ -1,0 +1,7 @@
+aws configure
+aws ec2 start-instances --instance-id [ID]
+aws ec2 describe-instances --instance-id [ID]
+
+ssh -i ["*.pem"] ubuntu@[PublicDnsName]
+
+
