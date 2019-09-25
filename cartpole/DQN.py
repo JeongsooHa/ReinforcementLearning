@@ -116,16 +116,18 @@ def main():
     optimizer = optim.Adam(q.parameters(), lr = 0.0005)
 
     for n_epi in range(10000):
+
         epsilon = max(0.01, 0.08 - 0.01*(n_epi/200)) # Linear annealing from 8% to 1%
         s = env.reset()
-
+        env.render()
         for t in range(600):
             a = q.sample_action(torch.from_numpy(s).float(), epsilon)
-            s_prime, r, done, info = env.step(a)
 
+            s_prime, r, done, info = env.step(a)
             # game이 끝난 step이면 0이고 아니면 1
             # TD target 곱할때 테크
             done_mark = 0.0 if done else 1.0
+            print(r/200)
             memory.put((s, a, r/200, s_prime, done_mark))
             s = s_prime
 
