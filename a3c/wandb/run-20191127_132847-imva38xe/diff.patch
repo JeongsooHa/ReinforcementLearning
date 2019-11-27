@@ -1,0 +1,45 @@
+diff --git a/a3c/__pycache__/envs.cpython-37.pyc b/a3c/__pycache__/envs.cpython-37.pyc
+new file mode 100644
+index 0000000..12f3b5c
+Binary files /dev/null and b/a3c/__pycache__/envs.cpython-37.pyc differ
+diff --git a/a3c/__pycache__/model.cpython-37.pyc b/a3c/__pycache__/model.cpython-37.pyc
+new file mode 100644
+index 0000000..c0c2aa0
+Binary files /dev/null and b/a3c/__pycache__/model.cpython-37.pyc differ
+diff --git a/a3c/__pycache__/my_optim.cpython-37.pyc b/a3c/__pycache__/my_optim.cpython-37.pyc
+new file mode 100644
+index 0000000..e1a9290
+Binary files /dev/null and b/a3c/__pycache__/my_optim.cpython-37.pyc differ
+diff --git a/a3c/__pycache__/test.cpython-37.pyc b/a3c/__pycache__/test.cpython-37.pyc
+new file mode 100644
+index 0000000..86cd685
+Binary files /dev/null and b/a3c/__pycache__/test.cpython-37.pyc differ
+diff --git a/a3c/__pycache__/train.cpython-37.pyc b/a3c/__pycache__/train.cpython-37.pyc
+new file mode 100644
+index 0000000..add1e87
+Binary files /dev/null and b/a3c/__pycache__/train.cpython-37.pyc differ
+diff --git a/a3c/main.py b/a3c/main.py
+index fec7733..06f2ece 100644
+--- a/a3c/main.py
++++ b/a3c/main.py
+@@ -25,9 +25,9 @@ parser.add_argument('--max-grad-norm', type=float, default=50,
+                     help='value loss coefficient (default: 50)')
+ parser.add_argument('--seed', type=int, default=1,
+                     help='random seed (default: 1)')
+-parser.add_argument('--num-processes', type=int, default=0,
++parser.add_argument('--num-processes', type=int, default=4,
+                     help='how many training processes to use (default: 4)')
+-parser.add_argument('--num-steps', type=int, default=20,
++parser.add_argument('--num-steps', type=int, default=100,
+                     help='number of forward steps in A3C (default: 20)')
+ parser.add_argument('--max-episode-length', type=int, default=1000000,
+                     help='maximum length of an episode (default: 1000000)')
+@@ -35,7 +35,7 @@ parser.add_argument('--env-name', default='PongDeterministic-v4',
+                     help='environment to train on (default: PongDeterministic-v4)')
+ parser.add_argument('--no-shared', default=False,
+                     help='use an optimizer without shared momentum.')
+-parser.add_argument('--wandb', default=False,
++parser.add_argument('--wandb', default=True,
+                     help='wandb option.')
+ 
+ if __name__ == '__main__':
