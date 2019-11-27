@@ -29,7 +29,7 @@ docopt==0.6.2
 docutils==0.15.2
 entrypoints==0.3
 enum34==1.1.6
-flask==0.12
+flask==1.0
 future==0.18.1
 gast==0.3.2
 gitdb2==2.0.6
