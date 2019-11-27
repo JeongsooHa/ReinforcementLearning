@@ -1,5 +1,6 @@
 import time
 from collections import deque
+import wandb
 
 import torch
 import torch.nn.functional as F
@@ -52,6 +53,9 @@ def test(rank, args, shared_model, counter):
         actions.append(action[0, 0])
         if actions.count(actions[0]) == actions.maxlen:
             done = True
+
+        if args.wandb:
+            wandb.log({"test reward": reward_sum})
 
         if done:
             print("Time {}, num steps {}, FPS {:.0f}, episode reward {}, episode length {}".format(

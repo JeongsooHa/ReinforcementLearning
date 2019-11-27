@@ -9,7 +9,6 @@ from model import ActorCritic
 from test import test
 from train import train
 
-torch.device('cpu')
 
 parser = argparse.ArgumentParser(description='A3C')
 parser.add_argument('--lr', type=float, default=0.0001,
@@ -36,6 +35,8 @@ parser.add_argument('--env-name', default='PongDeterministic-v4',
                     help='environment to train on (default: PongDeterministic-v4)')
 parser.add_argument('--no-shared', default=False,
                     help='use an optimizer without shared momentum.')
+parser.add_argument('--wandb', default=False,
+                    help='wandb option.')
 
 if __name__ == '__main__':
     os.environ['OMP_NUM_THREADS'] = '1'
@@ -51,6 +52,9 @@ if __name__ == '__main__':
         env.observation_space.shape[0], env.action_space
     )
     shared_model.share_memory()
+    if args.wandb:
+        import wandb
+        wandb.init(project="reinforce")
 
     if args.no_shared:
         optimizer = None

@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+import wandb
 
 from envs import create_atari_env
 from model import ActorCritic
@@ -109,3 +110,9 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
 
         ensure_shared_grads(model, shared_model)
         optimizer.step()
+
+        if args.wandb:
+            wandb.log({"policy loss": policy_loss,
+                       "gae":gae,
+                       "reward":sum(rewards)})
+
