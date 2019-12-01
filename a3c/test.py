@@ -39,11 +39,11 @@ def test(rank, args, shared_model, counter):
             cx = torch.zeros(1, 256).to(device)
             hx = torch.zeros(1, 256).to(device)
         else:
-            cx = cx.detach().to(device)
-            hx = hx.detach().to(device)
+            cx = cx.to(device)
+            hx = hx.to(device)
 
-        with torch.no_grad():
-            value, logit, (hx, cx) = model((state.unsqueeze(0), (hx, cx)))
+        # with torch.no_grad():
+        value, logit, (hx, cx) = model((state.unsqueeze(0), (hx, cx)))
         prob = F.softmax(logit, dim=-1)
         action = prob.max(1, keepdim=True)[1].numpy()
 

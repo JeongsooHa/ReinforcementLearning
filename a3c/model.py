@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+import multiprocessing
 
 def normalized_columns_initializer(weights, std=1.0):
     out = torch.randn(weights.size())
@@ -56,6 +56,7 @@ class ActorCritic(torch.nn.Module):
         self.train()
 
     def forward(self, inputs):
+        print("forward ",multiprocessing.current_process())
         input, (hx, cx) = inputs
         x = F.elu(self.conv1(input.float()))
         x = F.elu(self.conv2(x))
@@ -63,7 +64,10 @@ class ActorCritic(torch.nn.Module):
         x = F.elu(self.conv4(x))
 
         x = x.view(-1, 32 * 10 * 1)
+        print("before ",multiprocessing.current_process())
         hx, cx = self.lstm(x, (hx, cx))
+        print("after ",multiprocessing.current_process())
+
         x = hx
 
         return self.critic_linear(x), self.actor_linear(x), (hx, cx)
