@@ -1,20 +1,20 @@
 import time
 from collections import deque
-import wandb
 
+import wandb
 import torch
 import torch.nn.functional as F
 
 from envs import create_atari_env
 from model import ActorCritic
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 def test(rank, args, shared_model, counter):
     torch.manual_seed(args.seed + rank)
 
     env = create_atari_env(args.env_name)
-    # import gym
-    # env = gym.make(args.envs.env_name)
     env.seed(args.seed + rank)
 
     model = ActorCritic(env.observation_space.shape[0], env.action_space)
@@ -28,17 +28,19 @@ def test(rank, args, shared_model, counter):
 
     start_time = time.time()
 
+    # a quick hack to prevent the agent from stucking
     actions = deque(maxlen=100)
     episode_length = 0
     while True:
         episode_length += 1
+        # Sync with the shared model
         if done:
             model.load_state_dict(shared_model.state_dict())
-            cx = torch.zeros(1, 256)
-            hx = torch.zeros(1, 256)
+            cx = torch.zeros(1, 256).to(device)
+            hx = torch.zeros(1, 256).to(device)
         else:
-            cx = cx.detach()
-            hx = hx.detach()
+            cx = cx.detach().to(device)
+            hx = hx.detach().to(device)
 
         with torch.no_grad():
             value, logit, (hx, cx) = model((state.unsqueeze(0), (hx, cx)))

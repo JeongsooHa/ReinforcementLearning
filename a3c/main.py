@@ -1,5 +1,8 @@
+from __future__ import print_function
+
 import argparse
 import os
+
 import torch
 import torch.multiprocessing as mp
 
@@ -9,7 +12,9 @@ from model import ActorCritic
 from test import test
 from train import train
 
-
+# Based on
+# https://github.com/pytorch/examples/tree/master/mnist_hogwild
+# Training settings
 parser = argparse.ArgumentParser(description='A3C')
 parser.add_argument('--lr', type=float, default=0.0001,
                     help='learning rate (default: 0.0001)')
@@ -27,7 +32,7 @@ parser.add_argument('--seed', type=int, default=1,
                     help='random seed (default: 1)')
 parser.add_argument('--num-processes', type=int, default=4,
                     help='how many training processes to use (default: 4)')
-parser.add_argument('--num-steps', type=int, default=100,
+parser.add_argument('--num-steps', type=int, default=20,
                     help='number of forward steps in A3C (default: 20)')
 parser.add_argument('--max-episode-length', type=int, default=1000000,
                     help='maximum length of an episode (default: 1000000)')
@@ -35,22 +40,20 @@ parser.add_argument('--env-name', default='PongDeterministic-v4',
                     help='environment to train on (default: PongDeterministic-v4)')
 parser.add_argument('--no-shared', default=False,
                     help='use an optimizer without shared momentum.')
-parser.add_argument('--wandb', default=True,
+parser.add_argument('--wandb', default=False,
                     help='wandb option.')
 
 if __name__ == '__main__':
     os.environ['OMP_NUM_THREADS'] = '1'
     os.environ['CUDA_VISIBLE_DEVICES'] = ""
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     args = parser.parse_args()
 
     torch.manual_seed(args.seed)
     env = create_atari_env(args.env_name)
-    # import gym
-    # env = gym.make(args.env_name)
     shared_model = ActorCritic(
-        env.observation_space.shape[0], env.action_space
-    )
+        env.observation_space.shape[0], env.action_space).to(device)
     shared_model.share_memory()
     if args.wandb:
         import wandb

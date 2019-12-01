@@ -1,10 +1,12 @@
+import wandb
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-import wandb
 
 from envs import create_atari_env
 from model import ActorCritic
+
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def ensure_shared_grads(model, shared_model):
@@ -19,8 +21,6 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
     torch.manual_seed(args.seed + rank)
 
     env = create_atari_env(args.env_name)
-    # import gym
-    # env = gym.make(args.env_name)
     env.seed(args.seed + rank)
 
     model = ActorCritic(env.observation_space.shape[0], env.action_space)
@@ -31,7 +31,7 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
     model.train()
 
     state = env.reset()
-    state = torch.from_numpy(state)
+    state = torch.from_numpy(state).to(device)
     done = True
 
     episode_length = 0
@@ -39,11 +39,11 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
         # Sync with the shared model
         model.load_state_dict(shared_model.state_dict())
         if done:
-            cx = torch.zeros(1, 256)
-            hx = torch.zeros(1, 256)
+            cx = torch.zeros(1, 256).to(device)
+            hx = torch.zeros(1, 256).to(device)
         else:
-            cx = cx.detach()
-            hx = hx.detach()
+            cx = cx.detach().to(device)
+            hx = hx.detach().to(device)
 
         values = []
         log_probs = []
@@ -97,11 +97,11 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
 
             # Generalized Advantage Estimation
             delta_t = rewards[i] + args.gamma * \
-                      values[i + 1] - values[i]
+                values[i + 1] - values[i]
             gae = gae * args.gamma * args.gae_lambda + delta_t
 
             policy_loss = policy_loss - \
-                          log_probs[i] * gae.detach() - args.entropy_coef * entropies[i]
+                log_probs[i] * gae.detach() - args.entropy_coef * entropies[i]
 
         optimizer.zero_grad()
 
@@ -113,6 +113,5 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
 
         if args.wandb:
             wandb.log({"policy loss": policy_loss,
-                       "gae":gae,
-                       "reward":sum(rewards)})
-
+                       "gae": gae,
+                       "reward": sum(rewards)})

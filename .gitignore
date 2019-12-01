@@ -1,7 +1,6 @@
 wandb/
-a3c/wandb/*.log
-a3c/*.pyc
 .DS_Store
 .idea/
 .ipynb_checkpoints/
-a3c/wandb/debug.log
+*.pyc
+
