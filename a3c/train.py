@@ -42,8 +42,8 @@ def train(rank, args, shared_model, counter, lock, optimizer=None):
             cx = torch.zeros(1, 256).to(device)
             hx = torch.zeros(1, 256).to(device)
         else:
-            cx = cx.to(device)
-            hx = hx.to(device)
+            cx = cx.detach().to(device)
+            hx = hx.detach().to(device)
 
         values = []
         log_probs = []
